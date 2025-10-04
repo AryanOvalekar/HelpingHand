@@ -14,7 +14,7 @@ const SlideMenu = () => {
       {/* Toggle Button */}
       <button
         onClick={toggleMenu}
-        className="slide-menu-toggle"
+        className={`slide-menu-toggle ${isOpen ? 'open' : 'closed'}`}
       >
         {isOpen ? 'Close -' : 'Menu +'}
       </button>
