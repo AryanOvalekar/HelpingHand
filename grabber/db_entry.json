@@ -1,0 +1,14 @@
+{
+    "_id": {"$oid":"68e1918cb65c205da9c06f86"},
+    "title":"",
+    "description":"",
+    "link":"",
+    "location":"",
+    "time":"1991-12-01T00:00:00",
+    "needClothes":false,
+    "needFood":false,
+    "needManpower":false,
+    "needFunding":false,
+    "longitude": {"$numberInt":"69"},
+    "latitude":{"$numberInt":"420"}
+}
