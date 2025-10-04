@@ -1,0 +1,95 @@
+.homepage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  padding: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.homepage-title {
+  font-size: 4rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  color: black;
+  text-align: center;
+}
+
+.homepage-description {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 35px 0;
+  color: #333;
+  max-width: 600px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.homepage-buttons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.homepage-button {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: white;
+  background: linear-gradient(135deg, var(--accent-color-1), var(--accent-color-2));
+  border: none;
+  border-radius: 25px;
+  padding: 15px 40px;
+  margin: 0 0 40px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+}
+
+.homepage-button-outline {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: black;
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 25px;
+  padding: 13px 38px;
+  margin: 0 0 40px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Inter', sans-serif;
+  background-image: linear-gradient(white, white), linear-gradient(135deg, var(--accent-color-1), var(--accent-color-2));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-button-outline:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
