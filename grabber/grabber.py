@@ -4,15 +4,14 @@ import time
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+import pymongo
 
 import grabutil
 
-# api scraping
-# make sure its formatted well
-# ai parsing
-
 load_dotenv()
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+MONGO_URI=os.getenv("MONGO_URI")
+AI_STUDIO_KEY=os.getenv("AI_STUDIO_KEY")
 
 keywords = []
 with open("news_keywords.json") as keywordFile:
@@ -22,8 +21,8 @@ with open("news_keywords.json") as keywordFile:
 def query_news(query, fromTime='', searchIn = ''):
     target = f'https://newsapi.org/v2/everything?q={query}'
 
-    if not fromTime: fromTime = grabutil.yesterday()
-    target += f'&from={fromTime}'
+    #if not fromTime: fromTime = grabutil.yesterday()
+    #target += f'&from={fromTime}'
 
     if searchIn:
         target +=f'&searchIn={searchIn}'
@@ -31,6 +30,7 @@ def query_news(query, fromTime='', searchIn = ''):
 
     target += f'&apiKey={NEWS_API_KEY}'
     return requests.get(target)
+
 
 
 # while True:
