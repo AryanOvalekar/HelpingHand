@@ -1,55 +1,41 @@
-import React, { useEffect, useRef } from 'react'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import React from 'react'
 import './MapView.css'
+import { useRef, useEffect } from 'react'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Set the Mapbox access token
-mapboxgl.accessToken = 'pk.eyJ1IjoiYXJ5YW5vdmFsZWthciIsImEiOiJjbWdjcTN6eHIwczV5MmxvN2JyN3l5NWtzIn0.E_z4d_rTKDpEcDNJe_GLQg'
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 
 const MapView = () => {
-  const mapContainer = useRef(null)
-  const map = useRef(null)
+    const mapContainer = useRef(null)
+    const map = useRef(null)
 
-  useEffect(() => {
-    if (map.current) return // Initialize map only once
+    useEffect(() => {
+        if (map.current) return
 
-    console.log('Initializing map...')
-    console.log('Container:', mapContainer.current)
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: 'mapbox://styles/aryanovalekar/cmgcq0dn4007s01sb7cqg5fia',
+            center: [-24, 42],
+            zoom: 1
+        })
 
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/aryanovalekar/cmgcq0dn4007s01sb7cqg5fia',
-        center: [-74.006, 40.7128], // NYC coordinates as default
-        zoom: 12
-      })
+        map.current.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+            })
+        );
 
-      map.current.on('load', () => {
-        console.log('Map loaded successfully!')
-      })
+        return () => {
+        }
+    }, [])
 
-      map.current.on('error', (e) => {
-        console.error('Map error:', e)
-      })
-
-    } catch (error) {
-      console.error('Error creating map:', error)
-    }
-
-    // Cleanup function
-    return () => {
-      if (map.current) {
-        map.current.remove()
-      }
-    }
-  }, [])
-
-  return (
-    <div 
-      ref={mapContainer} 
-      className="map-container"
-    />
-  )
+    return (
+        <div id="map-container" ref={mapContainer}>
+        </div>
+    )
 }
 
 export default MapView
