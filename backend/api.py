@@ -1,33 +1,43 @@
-from fastapi import FastAPI
-from fastapi import Depends
-from dotenv import load_dotenv
+from fastapi import FastAPI, status, Request, Body, Response, HTTPException
+from fastapi.encoders import jsonable_encoder
+from models import articleModel
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
 import os
-
 
 load_dotenv()
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
-uri = os.getenv('MONGO_URI')
-print(uri)
-# Create a new client and connect to the server
-client = MongoClient(uri, server_api=ServerApi('1'))
-# Send a ping to confirm a successful connection
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    print(e)
-"""
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.conn = globals.connPool.getConnection()
+    uri = os.getenv('MONGO_URI')
+    # Create a new client and connect to the server
+    app.client = MongoClient(uri, server_api=ServerApi('1'))
+    # Send a ping to confirm a successful connection
+    try:
+        app.client.admin.command('ping')
+        
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+    app.db = app.client["articles"]
     yield
-    globals.connPool.pool.putconn(app.state.conn)
-"""
-app = FastAPI()
+    app.db.close()
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 async def pingApi():
     return {"ping": "pong"}
+
+@app.post("/create", response_description="Creating new article", status_code=status.HTTP_201_CREATED, response_model=articleModel.articleModel)
+def create_book(request: Request, article: articleModel.articleModel = Body(...)):
+    article = jsonable_encoder(article)
+    new_article = request.app.db["articles"].insert_one(article)
+    created_article = request.app.db["articles"].find_one(
+        {"_id": new_article.inserted_id}
+    )
+
+    return created_article
