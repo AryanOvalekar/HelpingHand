@@ -5,13 +5,13 @@ import './Homepage.css'
 const Homepage = () => {
   return (
     <div className="homepage">
-      <h1 className="homepage-title">Name Here</h1>
+      <h1 className="homepage-title">Helping Hand</h1>
       <p className="homepage-description">
-        Helping the community, one <span className="gradient-text">step</span> at a time
+        <span className="gradient-text">Helping</span> the community, one step at a time
       </p>
       <div className="homepage-buttons">
-        <Link to="/list" className="homepage-button">Start Helping</Link>
-        <Link to="/map" className="homepage-button-outline">View Map</Link>
+        <Link to="/map" className="homepage-button">Start Helping</Link>
+        <Link to="/about-us" className="homepage-button-outline">Our Mission</Link>
       </div>
     </div>
   )
