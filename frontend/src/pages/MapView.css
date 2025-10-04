@@ -3,3 +3,17 @@
   height: 100vh;
   position: relative;
 }
+
+.map-overlay-box {
+  position: fixed;
+  top: 15px; /* Position below the menu */
+  left: 15px;
+  width: 92px;
+  height: 52px;
+  background-color: white;
+  border-radius: 7px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  padding: 20px;
+  box-sizing: border-box;
+}

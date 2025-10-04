@@ -33,8 +33,13 @@ const MapView = () => {
     }, [])
 
     return (
-        <div id="map-container" ref={mapContainer}>
-        </div>
+        <>
+            <div id="map-container" ref={mapContainer}>
+            </div>
+            <div className="map-overlay-box">
+                {/* Content for the white box can go here */}
+            </div>
+        </>
     )
 }
 
