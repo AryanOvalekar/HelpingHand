@@ -13,12 +13,7 @@
 .about-content {
   max-width: 800px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
   padding: 60px 50px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .about-title {
@@ -28,12 +23,22 @@
   color: #1a1a1a;
   text-align: center;
   font-family: 'Inter', sans-serif;
+  animation: slideInFromTop 0.8s ease-out;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
 }
 
 .about-text {
   line-height: 1.8;
   color: #333;
   font-family: 'Inter', sans-serif;
+  animation: slideInFromLeft 1s ease-out 0.3s both;
 }
 
 .about-text p {
@@ -44,6 +49,29 @@
 
 .about-text p:last-child {
   margin-bottom: 0;
+}
+
+.github-link {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.github-link a {
+  display: inline-block;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.github-link a:hover {
+  transform: translateY(-2px);
+  opacity: 0.7;
+}
+
+.github-link svg {
+  width: 32px;
+  height: 32px;
 }
 
 @media (max-width: 768px) {
@@ -62,5 +90,27 @@
   .about-text p {
     font-size: 1rem;
     text-align: left;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
