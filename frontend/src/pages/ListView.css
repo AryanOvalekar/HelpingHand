@@ -1,0 +1,11 @@
+.listview {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 80px 20px 40px 20px;
+  box-sizing: border-box;
+  background-image: radial-gradient(circle, #d3d3d3 1.5px, transparent 1.5px);
+  background-size: 35px 35px;
+}
