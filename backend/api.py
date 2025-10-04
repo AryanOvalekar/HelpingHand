@@ -3,6 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from models import articleModel
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -33,7 +34,7 @@ async def pingApi():
     return {"ping": "pong"}
 
 @app.post("/create", response_description="Creating new article", status_code=status.HTTP_201_CREATED, response_model=articleModel.articleModel)
-def create_book(request: Request, article: articleModel.articleModel = Body(...)):
+def create_article(request: Request, article: articleModel.articleModel = Body(...)):
     article = jsonable_encoder(article)
     new_article = request.app.db["articles"].insert_one(article)
     created_article = request.app.db["articles"].find_one(
@@ -41,3 +42,8 @@ def create_book(request: Request, article: articleModel.articleModel = Body(...)
     )
 
     return created_article
+
+@app.get("/recent", response_description="Getting all recent articles", status_code=status.HTTP_200_OK)
+def get_recent_article(request: Request, response: Response):
+    results = request.app.db["articles"].find()
+    return [document for document in results if document["time"] > "1990-12-01"]#hardcoded XDD

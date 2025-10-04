@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 class articleModel(BaseModel):
@@ -7,6 +8,11 @@ class articleModel(BaseModel):
     description: str = Field(...)
     link: str = Field(...)
     location: str = Field(...)
+    date: datetime = Field(...)
+    needClothes: bool = False
+    needFood: bool = False
+    needManpower: bool = False
+    needFunding: bool = False
     longitude: int = 0
     latitude: int = 0
 
