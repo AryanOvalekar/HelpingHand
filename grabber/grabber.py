@@ -4,39 +4,42 @@ import time
 import json
 from datetime import datetime
 from dotenv import load_dotenv
+
 import pymongo
+from newsapi import NewsApiClient
+from google import genai
+from google.genai import types
 
 import grabutil
 
 load_dotenv()
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
-MONGO_URI=os.getenv("MONGO_URI")
-AI_STUDIO_KEY=os.getenv("AI_STUDIO_KEY")
+newsClient = NewsApiClient(api_key = os.getenv("NEWS_API_KEY"))
+mongoClient = pymongo.MongoClient(os.getenv("MONGO_URI"))
+geminiClient = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 keywords = []
 with open("news_keywords.json") as keywordFile:
     keyJson = json.load(keywordFile)
     keywords = [word for word in keyJson["include"]]
 
-def query_news(query, fromTime='', searchIn = ''):
-    target = f'https://newsapi.org/v2/everything?q={query}'
-
-    #if not fromTime: fromTime = grabutil.yesterday()
-    #target += f'&from={fromTime}'
-
-    if searchIn:
-        target +=f'&searchIn={searchIn}'
-        
-
-    target += f'&apiKey={NEWS_API_KEY}'
-    return requests.get(target)
-
-
+#def add_newsapi_to_mongodb()
 
 # while True:
 #     req = query_news(fill_with_random_words(keywords))
 #     print(req.text)
 #     time.sleep(60)
 
+# wordList = grabutil.create_word_list(keywords, 500)
 
-print(query_news(grabutil.create_word_list(keywords, 100)).text)
+# response = newsClient.get_everything(q=wordList)
+# print(response["articles"])
+
+response = geminiClient.models.generate_content(
+    model="gemini-2.5-flash-lite",
+    contents="This is a test. Say hello to the terminal!",
+    config=types.GenerateContentConfig(
+        thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
+    )
+)
+
+print(response.text)
