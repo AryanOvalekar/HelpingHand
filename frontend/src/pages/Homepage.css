@@ -11,6 +11,8 @@
   position: fixed;
   top: 0;
   left: 0;
+  background-image: radial-gradient(circle, #d3d3d3 1.5px, transparent 1.5px);
+  background-size: 35px 35px;
 }
 
 .homepage-title {
