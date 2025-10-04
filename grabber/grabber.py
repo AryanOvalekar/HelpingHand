@@ -27,10 +27,10 @@ geminiClient = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 wordList = grabutil.create_word_list("news_keywords.json", 500)
 
 response = newsClient.get_everything(q=wordList, sort_by="relevancy", domains="")
-print(response["totalResults"])
+#print(response["totalResults"])
 
 #upload_article_to_mongo(article_to_db_entry(response["articles"][0]), mongoClient)
-# print(response["articles"])
+print(response["articles"])
 
 # response = geminiClient.models.generate_content(
 #     model="gemini-2.5-flash-lite",
