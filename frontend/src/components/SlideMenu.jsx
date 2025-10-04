@@ -28,7 +28,7 @@ const SlideMenu = () => {
           <Link to="/map" className="slide-menu-link">Map</Link>
         </div>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
-          <Link to="/list" className="slide-menu-link">List</Link>
+          <Link to="/incidents" className="slide-menu-link">Incidents</Link>
         </div>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
           <Link to="/about-us" className="slide-menu-link">About</Link>
