@@ -23,6 +23,7 @@
   color: #1a1a1a;
   text-align: center;
   font-family: 'Inter', sans-serif;
+  animation: slideInFromTop 0.8s ease-out;
 }
 
 .gradient-text {
@@ -37,6 +38,7 @@
   line-height: 1.8;
   color: #333;
   font-family: 'Inter', sans-serif;
+  animation: slideInFromLeft 1s ease-out 0.3s both;
 }
 
 .about-text p {
@@ -88,5 +90,27 @@
   .about-text p {
     font-size: 1rem;
     text-align: left;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
