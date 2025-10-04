@@ -18,15 +18,25 @@
 .homepage-title {
   font-size: 4rem;
   font-weight: 700;
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   color: black;
+  text-align: center;
+}
+
+.homepage-explanation {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin: 0 0 25px 0;
+  color: #555;
+  max-width: 800px;
+  line-height: 1.5;
   text-align: center;
 }
 
 .homepage-description {
   font-size: 1.5rem;
   font-weight: 400;
-  margin: 0 0 35px 0;
+  margin: 0 0 15px 0;
   color: #333;
   max-width: 600px;
   line-height: 1.6;
