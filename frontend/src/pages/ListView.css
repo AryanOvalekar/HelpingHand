@@ -24,6 +24,38 @@
   font-family: 'Inter', sans-serif;
 }
 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  min-height: 50vh;
+}
+
+.error-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  background: linear-gradient(135deg, var(--accent-color-1), var(--accent-color-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #1a1a1a;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  max-width: 500px;
+  opacity: 0.8;
+}
+
 @media (max-width: 768px) {
   .listview {
     padding: 80px 15px 40px 15px;
@@ -35,5 +67,17 @@
   
   .listview-title {
     font-size: 2rem;
+  }
+  
+  .error-container {
+    padding: 40px 15px;
+  }
+  
+  .error-title {
+    font-size: 2rem;
+  }
+  
+  .error-message {
+    font-size: 1rem;
   }
 }

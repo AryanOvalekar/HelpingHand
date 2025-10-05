@@ -51,7 +51,7 @@ const ListView = () => {
     return (
       <div className="listview">
         <div className="listview-content">
-          <div className="loading">Loading events...</div>
+          {/* Loading without text */}
         </div>
       </div>
     )
@@ -61,7 +61,10 @@ const ListView = () => {
     return (
       <div className="listview">
         <div className="listview-content">
-          <div className="error">Error loading events: {error}</div>
+          <div className="error-container">
+            <h2 className="error-title">Something went wrong</h2>
+            <p className="error-message">{error}</p>
+          </div>
         </div>
       </div>
     )
