@@ -107,14 +107,23 @@ const MapView = () => {
         events.forEach((event) => {
             if (event.longitude && event.latitude && 
                 !(event.longitude === 0 && event.latitude === 0)) {
+                
+                // Create custom pulsing dot element
+                const markerElement = document.createElement('div');
+                markerElement.className = 'pulsing-marker';
+                markerElement.innerHTML = `
+                    <div class="pulsing-dot"></div>
+                    <div class="pulsing-ring"></div>
+                `;
+                
                 const marker = new mapboxgl.Marker({
-                    color: '#dc3545' // Same red color for all markers
+                    element: markerElement
                 })
                 .setLngLat([event.longitude, event.latitude])
                 .addTo(map.current);
 
                 // Add click event to each marker
-                marker.getElement().addEventListener('click', (e) => {
+                markerElement.addEventListener('click', (e) => {
                     e.stopPropagation();
                     
                     setSidePanelState({
