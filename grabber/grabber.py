@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import pymongo
 import newsapi
+import geopy
 from google import genai
 from google.genai import types
 
@@ -15,6 +16,7 @@ import grabutil
 load_dotenv()
 newsClient = newsapi.NewsApiClient(api_key = os.getenv("NEWS_API_KEY"))
 geminiClient = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+geolocator = geopy.GoogleV3(api_key=os.getenv("GEOCODING_API_KEY"))
 backendUrl = "http://localhost:8000"
 
 def getArticles():
@@ -24,7 +26,6 @@ def getArticles():
     return response
 
 def classifyData(response):
-
     goodResponses = [curr for curr in response['articles'] if type(curr) == dict and "title" in curr]
 
     titles = [curr['title'] for curr in goodResponses]
@@ -49,7 +50,11 @@ def classifyData(response):
     return total
 
 def addGeolocation(total):
-    pass
+    for response in total:
+        if response["location"].strip() != "UNKNOWN":
+            location = geolocator.geocode(response["location"], exactly_one=True)
+            response["latitude"] = location.latitude
+            response["longitude"] = location.longitude
 
 #TODO
 def postNews(newsArticle):
