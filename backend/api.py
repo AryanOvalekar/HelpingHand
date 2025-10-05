@@ -1,4 +1,5 @@
 from fastapi import FastAPI, status, Request, Body, Response, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from models import articleModel
 from contextlib import asynccontextmanager
@@ -28,6 +29,15 @@ async def lifespan(app: FastAPI):
     app.db["articles"].close()
 
 app = FastAPI(lifespan=lifespan)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"],  # Common React dev server ports
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 async def pingApi():
