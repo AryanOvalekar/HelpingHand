@@ -13,8 +13,8 @@ class articleModel(BaseModel):
     needFood: bool = False
     needManpower: bool = False
     needFunding: bool = False
-    longitude: int = 0
-    latitude: int = 0
+    longitude: float = 0
+    latitude: float = 0
 
     class Config:
         validate_by_name = True

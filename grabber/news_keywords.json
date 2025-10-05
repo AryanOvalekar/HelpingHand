@@ -1,11 +1,11 @@
 {
     "include": [
-        "flood"
+        "flood",
         "relief",
         "recovery",
         "evacuation",
         "evacuees",
-        "shelter"
+        "shelter",
         "food assistance",
         "kitchen",
         "meals",
@@ -16,13 +16,13 @@
         "volunteer",
         "aid",
         "mental health",
-        "support"
+        "support",
         "reunification services",
         "resource",
         "clearance",
         "repairs",
         "rebuilding",
-        "translation",
+        "translation"
     ],
     "exclude": []
 }
