@@ -43,7 +43,7 @@ def create_article(request: Request, article: articleModel.articleModel = Body(.
 
     return created_article
 
-@app.get("/recent/", response_description="Getting all recent articles", status_code=status.HTTP_200_OK)
+@app.get("/recent", response_description="Getting all recent articles", status_code=status.HTTP_200_OK)
 def get_recent_article(request: Request):
     results = request.app.db["articles"].find()
     return [document for document in results] #no longer hardcoded :)
