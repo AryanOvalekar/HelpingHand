@@ -9,6 +9,10 @@ const SlideMenu = () => {
     setIsOpen(!isOpen)
   }
 
+  const closeMenu = () => {
+    setIsOpen(false)
+  }
+
   return (
     <>
       {/* Toggle Button */}
@@ -22,16 +26,16 @@ const SlideMenu = () => {
       {/* Menu Panel */}
       <div className={`slide-menu-panel ${isOpen ? 'open' : 'closed'}`}>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
-          <Link to="/" className="slide-menu-link">Home</Link>
+          <Link to="/" className="slide-menu-link" onClick={closeMenu}>Home</Link>
         </div>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
-          <Link to="/map" className="slide-menu-link">Map</Link>
+          <Link to="/map" className="slide-menu-link" onClick={closeMenu}>Map</Link>
         </div>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
-          <Link to="/incidents" className="slide-menu-link">Incidents</Link>
+          <Link to="/incidents" className="slide-menu-link" onClick={closeMenu}>Incidents</Link>
         </div>
         <div className={`slide-menu-item ${isOpen ? 'open' : 'closed'}`}>
-          <Link to="/about-us" className="slide-menu-link">About</Link>
+          <Link to="/about-us" className="slide-menu-link" onClick={closeMenu}>About</Link>
         </div>
       </div>
     </>
