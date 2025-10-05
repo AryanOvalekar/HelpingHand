@@ -18,6 +18,16 @@ Helping Hand is a volunteer-oriented platform that connects compassionate indivi
 - **Data Processing**: Python-based news aggregation and classification using Google Gemini
 - **APIs**: News API integration for real-time incident data
 
+## Demo
+
+Watch the demo on YouTube:
+Link will go here
+
+## Devpost
+
+View the project on Devpost:
+Link will go here
+
 ## Installation
 
 ### Prerequisites
@@ -66,13 +76,3 @@ fastapi run api.py --port 8000
 cd grabber
 # Command unknown for now
 ```
-
-## Demo
-
-Watch the demo on YouTube:
-[Insert link here]
-
-## Devpost
-
-View the project on Devpost:
-[Insert link here]
