@@ -67,7 +67,7 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
   const timeAgo = formatTimeAgo(event.publishedAt)
   const categoryInfo = getCategoryInfo(event.category)
   const needInfo = getNeedInfo(event.need)
-  const distance = '2.3 km away' // hardcoded for now
+  const distance = event.distanceAway || 'Distance unknown'
   const formattedLocation = formatLocation(event.location)
 
   const handleReadMore = () => {
