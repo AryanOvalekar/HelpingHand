@@ -40,10 +40,24 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
     return { type: 'food', emoji: '🍲', color: '#fd7e14', label: 'Food Needed' }
   }
 
+  // Helper function to format location
+  const formatLocation = (location) => {
+    if (!location) return 'Location not specified'
+    
+    // Split by comma and filter out empty strings and "unknown" values
+    const parts = location.split(',')
+      .map(part => part.trim())
+      .filter(part => part && part.toLowerCase() !== 'unknown')
+    
+    // Join the remaining parts
+    return parts.length > 0 ? parts.join(', ') : 'Location not specified'
+  }
+
   const timeAgo = formatTimeAgo(event.publishedAt)
   const categoryInfo = getCategoryInfo(event.category)
   const needInfo = getNeedInfo()
   const distance = '2.3 km away' // hardcoded for now
+  const formattedLocation = formatLocation(event.location)
 
   const handleReadMore = () => {
     if (event.articleLink || event.url) {
@@ -93,7 +107,7 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
           <p className="crisis-description">{event.description}</p>
           
           <div className="location-distance">
-            <span className="location">📍 {event.location}</span>
+            <span className="location">📍 {formattedLocation}</span>
             <span className="distance">{distance}</span>
           </div>
 
