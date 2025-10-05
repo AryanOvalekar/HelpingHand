@@ -49,62 +49,42 @@ const ListView = () => {
   }
 
   useEffect(() => {
-    const fetchEventsWithLocation = async () => {
+    const fetchEvents = async () => {
       try {
         setLoading(true)
         
-        // First, get user's location
-        let userLat = null
-        let userLon = null
-        
-        try {
-          const location = await getUserLocation()
-          userLat = location.latitude
-          userLon = location.longitude
-          setUserLocation(location)
-        } catch (locationError) {
-          console.warn('Could not get user location:', locationError.message)
-          // Continue without location - will use fallback distances
-        }
+        // Get user's location in the background
+        getUserLocation()
+          .then(location => {
+            setUserLocation(location)
+          })
+          .catch(locationError => {
+            console.warn('Could not get user location:', locationError.message)
+          })
 
-        // Then fetch events
+        // Fetch events immediately without waiting for location
         const response = await axios.get('http://localhost:8000/recent')
         
         // Map API response to frontend format, preserving all fields from the model
-        const mappedEvents = response.data.map((article, index) => {
-          let distanceAway = 'Distance unknown'
+        const mappedEvents = response.data.map((article, index) => ({
+          // Article model fields
+          id: article._id || article.id || index,
+          title: article.title,
+          description: article.description,
+          url: article.url,
+          urlToImage: article.urlToImage,
+          publishedAt: article.publishedAt,
+          category: article.category,
+          severity: article.severity,
+          location: article.location,
+          need: article.need,
+          longitude: article.longitude,
+          latitude: article.latitude,
           
-          // Calculate distance if we have both user location and event coordinates
-          if (userLat && userLon && article.latitude && article.longitude) {
-            const distance = calculateDistance(userLat, userLon, article.latitude, article.longitude)
-            if (distance < 1) {
-              distanceAway = `${Math.round(distance * 1000)}m away`
-            } else {
-              distanceAway = `${distance.toFixed(1)}km away`
-            }
-          }
-          
-          return {
-            // Article model fields
-            id: article._id || article.id || index,
-            title: article.title,
-            description: article.description,
-            url: article.url,
-            urlToImage: article.urlToImage,
-            publishedAt: article.publishedAt,
-            category: article.category,
-            severity: article.severity,
-            location: article.location,
-            need: article.need,
-            longitude: article.longitude,
-            latitude: article.latitude,
-            
-            // Frontend display fields (mapped from model)
-            imageLink: article.urlToImage,
-            articleLink: article.url,
-            distanceAway: distanceAway
-          }
-        })
+          // Frontend display fields (mapped from model)
+          imageLink: article.urlToImage,
+          articleLink: article.url
+        }))
         
         setEvents(mappedEvents)
       } catch (err) {
@@ -115,7 +95,7 @@ const ListView = () => {
       }
     }
 
-    fetchEventsWithLocation()
+    fetchEvents()
   }, [])
 
   if (loading) {
@@ -147,7 +127,11 @@ const ListView = () => {
   return (
     <div className="listview">
       <div className="listview-content">
-        <EventList events={eventsToDisplay} />
+        <EventList 
+          events={eventsToDisplay} 
+          userLocation={userLocation}
+          calculateDistance={calculateDistance}
+        />
       </div>
     </div>
   )

@@ -1,7 +1,31 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useState, useEffect } from 'react'
 import './EventCard.css'
 
-const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
+const EventCard = forwardRef(({ event, isVisible, cardIndex, userLocation, calculateDistance }, ref) => {
+  const [distance, setDistance] = useState('Distance calculating...')
+
+  // Calculate distance when userLocation becomes available
+  useEffect(() => {
+    if (userLocation && calculateDistance && event.latitude && event.longitude) {
+      const calculatedDistance = calculateDistance(
+        userLocation.latitude, 
+        userLocation.longitude, 
+        event.latitude, 
+        event.longitude
+      )
+      
+      let formattedDistance
+      if (calculatedDistance < 1) {
+        formattedDistance = `${Math.round(calculatedDistance * 1000)}m away`
+      } else {
+        formattedDistance = `${calculatedDistance.toFixed(1)}km away`
+      }
+      
+      setDistance(formattedDistance)
+    } else if (!event.latitude || !event.longitude) {
+      setDistance('Distance unknown')
+    }
+  }, [userLocation, calculateDistance, event.latitude, event.longitude])
   // Helper function to format time ago
   const formatTimeAgo = (publishedAt) => {
     if (!publishedAt) return '2 hours ago' // hardcoded fallback
@@ -67,7 +91,6 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
   const timeAgo = formatTimeAgo(event.publishedAt)
   const categoryInfo = getCategoryInfo(event.category)
   const needInfo = getNeedInfo(event.need)
-  const distance = event.distanceAway || 'Distance unknown'
   const formattedLocation = formatLocation(event.location)
 
   const handleReadMore = () => {
