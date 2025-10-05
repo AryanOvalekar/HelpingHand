@@ -4,3 +4,4 @@ requests==2.32.5
 pymongo==4.15.2
 newsapi-python==0.2.7
 google-genai==1.41.0
+geopy==2.4.1

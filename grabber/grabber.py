@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import pymongo
 import newsapi
+import geopy
 from google import genai
 from google.genai import types
 
@@ -15,25 +16,17 @@ import grabutil
 load_dotenv()
 newsClient = newsapi.NewsApiClient(api_key = os.getenv("NEWS_API_KEY"))
 geminiClient = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+geolocator = geopy.GoogleV3(api_key=os.getenv("GEOCODING_API_KEY"))
 backendUrl = "http://localhost:8000"
 
 def getArticles():
     wordList = grabutil.create_word_list("news_keywords.json", 500)
     response = newsClient.get_everything(q=wordList, sort_by="relevancy", domains="")
-
+    print(f"got {response["totalResults"]} news articles")
     return response
 
 def classifyData(response):
-
     goodResponses = [curr for curr in response['articles'] if type(curr) == dict and "title" in curr]
-
-    response = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents="This is a test. Say hello to the terminal!",
-        config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
-        )
-    )
 
     titles = [curr['title'] for curr in goodResponses]
     response = geminiClient.models.generate_content(
@@ -53,69 +46,43 @@ def classifyData(response):
             goodResponses[i]['severity'] = curr[2]
             goodResponses[i]['location'] = " ".join(curr[3:])
             total.append(goodResponses[i])
-
+    print(f"filtered and classified {len(total)} news articles")
     return total
 
 def addGeolocation(total):
-    pass
+    for response in total:
+        if response["location"].strip() != "UNKNOWN":
+            location = geolocator.geocode(response["location"], exactly_one=True)
+            response["latitude"] = location.latitude
+            response["longitude"] = location.longitude
 
 #TODO
-def add_newsapi_to_mongodb(newsArticle):
-    print(newsArticle)
-
-    prompt = f"The text after the newline is the title and description of an article that is most likely tied to a volunteering opportunity. Output only a 4-digit binary string indicating if anything in in the title or description indicates that the situation calls for someone to donate clothes, food, manpower, or funding, in that order.\nTitle: {newsArticle["title"]}\nDescription: {newsArticle["description"]}"
-
-    volunteerContext = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=prompt,
-        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_budget=0))
-    )
-
-    response = volunteerContext.text
-    print(response)
-    donateClothes = response[0] == '1'
-    donateFood = response[1] == '1'
-    donateManpower = response[2] == '1'
-    donateFunding = response[3] == '1'
-
-    prompt = f"The text after the newline is the title and description of an article. Try to output a location on the first line, as well as latitude and longitude separated by a space on the second. If you cannot do this, simply output \"UNKNOWN\" on whichever line(s) you are not sure about.\nTitle: {newsArticle["title"]}\nDescription: {newsArticle["description"]}"
-
-    volunteerContext = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=prompt,
-        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_budget=0))
-    )
-
-    print(volunteerContext.text)
-    response = volunteerContext.text.splitlines()
-    
-    location = "UNKNOWN"
-    latitude = None
-    longitude = None
-
-    if not "UNKNOWN" in response[0]:
-        location = response[0]
-
-    if not "UNKNOWN" in response[1]:
-        posPair = response[1].split(' ')
-        latitude = float(posPair[0])
-        longitude = float(posPair[1])
-
+def postNews(newsArticle):
+    needMap = {"food":0, "clothing":1, "money":2, "volunteers": 3}
+    severityMap = {"high":True, "low":False}
     pushArticle = {
         "title": newsArticle["title"],
         "description": newsArticle["description"],
-        "linkToImage": newsArticle["urlToImage"],
-        "link": newsArticle["url"],
-        "time": newsArticle["publishedAt"],
-        "needClothes": donateClothes,
-        "needFood": donateFood,
-        "needManpower": donateManpower,
-        "needFunding": donateFunding,
-        "location": location,
-        "latitude": latitude,
-        "longitude": longitude,
+        "url": newsArticle["url"],
+        "urlToImage": newsArticle["urlToImage"],
+        "location": newsArticle["location"],
+        "publishedAt": newsArticle["publishedAt"],
+        "severity": severityMap[newsArticle["severity"]],
+        "need": needMap[newsArticle["need"]],
+        "category": newsArticle["category"],
+        "longitude": newsArticle["longitude"],
+        "latitude": newsArticle["latitude"]
     }
 
-    httpResponse = requests.post(backendUrl + "/create/", json=pushArticle)
-    if(httpResponse.status_code != 200):
-        print(httpResponse)
+    httpResponse = requests.post(backendUrl + "/create", json=pushArticle)
+    if(httpResponse.status_code != 201):
+        print(httpResponse.status_code)
+        print(httpResponse.text)
+
+articlesList = classifyData(getArticles())
+for i in articlesList:
+    i["longitude"] = 38.8977
+    i["latitude"] = 77.0365
+    postNews(i)
+print(f"added {len(articlesList)} news articles")
+
