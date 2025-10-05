@@ -25,7 +25,7 @@ async def lifespan(app: FastAPI):
         print(e)
     app.db = app.client["articles"]
     yield
-    app.db.close()
+    app.db["articles"].close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -43,7 +43,7 @@ def create_article(request: Request, article: articleModel.articleModel = Body(.
 
     return created_article
 
-@app.get("/recent", response_description="Getting all recent articles", status_code=status.HTTP_200_OK)
-def get_recent_article(request: Request, response: Response):
+@app.get("/recent/{date}", response_description="Getting all recent articles", status_code=status.HTTP_200_OK)
+def get_recent_article(request: Request, date: datetime):
     results = request.app.db["articles"].find()
-    return [document for document in results if document["time"] > "1990-12-01"]#hardcoded XDD
+    return [document for document in results if document["time"] >= str(date)] #no longer hardcoded :)
