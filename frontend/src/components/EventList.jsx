@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import EventCard from './EventCard'
 import './EventList.css'
 
-const EventList = ({ events }) => {
+const EventList = ({ events, userLocation, calculateDistance }) => {
   const [visibleCards, setVisibleCards] = useState(new Set())
   const cardRefs = useRef([])
 
@@ -44,6 +44,8 @@ const EventList = ({ events }) => {
           event={event}
           cardIndex={index}
           isVisible={visibleCards.has(index)}
+          userLocation={userLocation}
+          calculateDistance={calculateDistance}
         />
       ))}
     </div>

@@ -1,7 +1,31 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useState, useEffect } from 'react'
 import './EventCard.css'
 
-const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
+const EventCard = forwardRef(({ event, isVisible, cardIndex, userLocation, calculateDistance }, ref) => {
+  const [distance, setDistance] = useState('Distance calculating...')
+
+  // Calculate distance when userLocation becomes available
+  useEffect(() => {
+    if (userLocation && calculateDistance && event.latitude && event.longitude) {
+      const calculatedDistance = calculateDistance(
+        userLocation.latitude, 
+        userLocation.longitude, 
+        event.latitude, 
+        event.longitude
+      )
+      
+      let formattedDistance
+      if (calculatedDistance < 1) {
+        formattedDistance = `${Math.round(calculatedDistance * 1000)}m away`
+      } else {
+        formattedDistance = `${calculatedDistance.toFixed(1)}km away`
+      }
+      
+      setDistance(formattedDistance)
+    } else if (!event.latitude || !event.longitude) {
+      setDistance('Distance unknown')
+    }
+  }, [userLocation, calculateDistance, event.latitude, event.longitude])
   // Helper function to format time ago
   const formatTimeAgo = (publishedAt) => {
     if (!publishedAt) return '2 hours ago' // hardcoded fallback
@@ -34,10 +58,21 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
     }
   }
 
-  // Helper function to get need info (hardcoded for now)
-  const getNeedInfo = () => {
-    // Hardcoded - will be dynamic later
-    return { type: 'food', emoji: '🍲', color: '#fd7e14', label: 'Food Needed' }
+  // Helper function to get need info
+  const getNeedInfo = (need) => {
+    switch(need) {
+      case 0:
+      case 'food':
+        return { type: 'food', emoji: '🍲', color: '#fd7e14', label: 'Food Needed' }
+      case 1:
+      case 'clothing':
+        return { type: 'clothing', emoji: '👕', color: '#6f42c1', label: 'Clothing Needed' }
+      case 2:
+      case 'money':
+        return { type: 'money', emoji: '💰', color: '#28a745', label: 'Funds Needed' }
+      default:
+        return { type: 'help', emoji: '🏃‍♂️', color: '#dc3545', label: 'Help Needed' }
+    }
   }
 
   // Helper function to format location
@@ -55,8 +90,7 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
 
   const timeAgo = formatTimeAgo(event.publishedAt)
   const categoryInfo = getCategoryInfo(event.category)
-  const needInfo = getNeedInfo()
-  const distance = '2.3 km away' // hardcoded for now
+  const needInfo = getNeedInfo(event.need)
   const formattedLocation = formatLocation(event.location)
 
   const handleReadMore = () => {
