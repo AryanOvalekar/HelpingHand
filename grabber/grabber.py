@@ -60,62 +60,36 @@ def addGeolocation(total):
     pass
 
 #TODO
-def add_newsapi_to_mongodb(newsArticle):
-    print(newsArticle)
-
-    prompt = f"The text after the newline is the title and description of an article that is most likely tied to a volunteering opportunity. Output only a 4-digit binary string indicating if anything in in the title or description indicates that the situation calls for someone to donate clothes, food, manpower, or funding, in that order.\nTitle: {newsArticle["title"]}\nDescription: {newsArticle["description"]}"
-
-    volunteerContext = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=prompt,
-        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_budget=0))
-    )
-
-    response = volunteerContext.text
-    print(response)
-    donateClothes = response[0] == '1'
-    donateFood = response[1] == '1'
-    donateManpower = response[2] == '1'
-    donateFunding = response[3] == '1'
-
-    prompt = f"The text after the newline is the title and description of an article. Try to output a location on the first line, as well as latitude and longitude separated by a space on the second. If you cannot do this, simply output \"UNKNOWN\" on whichever line(s) you are not sure about.\nTitle: {newsArticle["title"]}\nDescription: {newsArticle["description"]}"
-
-    volunteerContext = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents=prompt,
-        config=types.GenerateContentConfig(thinking_config=types.ThinkingConfig(thinking_budget=0))
-    )
-
-    print(volunteerContext.text)
-    response = volunteerContext.text.splitlines()
-    
-    location = "UNKNOWN"
-    latitude = None
-    longitude = None
-
-    if not "UNKNOWN" in response[0]:
-        location = response[0]
-
-    if not "UNKNOWN" in response[1]:
-        posPair = response[1].split(' ')
-        latitude = float(posPair[0])
-        longitude = float(posPair[1])
-
+def postNews(newsArticle):
     pushArticle = {
         "title": newsArticle["title"],
         "description": newsArticle["description"],
-        "linkToImage": newsArticle["urlToImage"],
-        "link": newsArticle["url"],
-        "time": newsArticle["publishedAt"],
-        "needClothes": donateClothes,
-        "needFood": donateFood,
-        "needManpower": donateManpower,
-        "needFunding": donateFunding,
-        "location": location,
-        "latitude": latitude,
-        "longitude": longitude,
+        "url": newsArticle["url"],
+        "urlToImage": newsArticle["urlToImage"],
+        "location": newsArticle["location"],
+        "publishedAt": newsArticle["publishedAt"],
+        "severity": newsArticle["severity"],
+        "need": newsArticle["need"],
+        "category": newsArticle["category"],
+        "longitude": newsArticle["longitude"],
+        "latitude": newsArticle["latitude"]
     }
 
-    httpResponse = requests.post(backendUrl + "/create/", json=pushArticle)
+    httpResponse = requests.post(backendUrl + "/create", json=pushArticle)
     if(httpResponse.status_code != 200):
         print(httpResponse)
+
+dummyArticle = {
+    "title": "test article",
+    "description": "an article was tested",
+    "url": "test ur;",
+    "urlToImage": "https://cdn.discordapp.com/attachments/1423330814208376944/1424257872736292876/B04A9519-8BC1-42D6-8D6C-806D5A0A8A71.png?ex=68e34b02&is=68e1f982&hm=0f1f698b677c78c0389e2d14409e7d16f20afa385c75398c49d81f0c2ae0ac7c&",
+    "location": "Phillidelphia",
+    "publishedAt": "2023-12-31",
+    "severity": False,
+    "need": 1,
+    "category": "warRelief",
+    "longitude": 38.8977,
+    "latitude": 77.0365
+}
+postNews(dummyArticle)
