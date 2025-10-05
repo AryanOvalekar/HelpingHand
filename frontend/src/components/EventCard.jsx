@@ -34,10 +34,21 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
     }
   }
 
-  // Helper function to get need info (hardcoded for now)
-  const getNeedInfo = () => {
-    // Hardcoded - will be dynamic later
-    return { type: 'food', emoji: '🍲', color: '#fd7e14', label: 'Food Needed' }
+  // Helper function to get need info
+  const getNeedInfo = (need) => {
+    switch(need) {
+      case 0:
+      case 'food':
+        return { type: 'food', emoji: '🍲', color: '#fd7e14', label: 'Food Needed' }
+      case 1:
+      case 'clothing':
+        return { type: 'clothing', emoji: '👕', color: '#6f42c1', label: 'Clothing Needed' }
+      case 2:
+      case 'money':
+        return { type: 'money', emoji: '💰', color: '#28a745', label: 'Funds Needed' }
+      default:
+        return { type: 'help', emoji: '🏃‍♂️', color: '#dc3545', label: 'Help Needed' }
+    }
   }
 
   // Helper function to format location
@@ -55,7 +66,7 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
 
   const timeAgo = formatTimeAgo(event.publishedAt)
   const categoryInfo = getCategoryInfo(event.category)
-  const needInfo = getNeedInfo()
+  const needInfo = getNeedInfo(event.need)
   const distance = '2.3 km away' // hardcoded for now
   const formattedLocation = formatLocation(event.location)
 
