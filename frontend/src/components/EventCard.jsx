@@ -6,8 +6,13 @@ const EventCard = forwardRef(({ event, isVisible, cardIndex }, ref) => {
     <div 
       ref={ref}
       data-card-index={cardIndex}
-      className={`event-card ${isVisible ? 'slide-in' : 'slide-hidden'}`}
+      className={`event-card ${isVisible ? 'slide-in' : 'slide-hidden'} ${event.severity ? 'severe' : ''}`}
     >
+      {event.severity && (
+        <div className="severity-indicator" title="This incident has been classified as severe">
+          ⚠️
+        </div>
+      )}
       <h2 className="event-title">{event.title}</h2>
       <div className="event-body">
         <div className="event-image">

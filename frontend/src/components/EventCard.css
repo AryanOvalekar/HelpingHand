@@ -2,10 +2,72 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: visible;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   padding: 20px;
+  position: relative;
+}
+
+.event-card.severe {
+  background: white;
+  box-shadow: 0 4px 12px rgba(150, 113, 5, 0.2);
+}
+
+.event-card.severe:hover {
+  box-shadow: 0 8px 20px rgba(189, 143, 5, 0.2);
+}
+
+.severity-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.2rem;
+  cursor: help;
+  z-index: 1000;
+  transition: transform 0.2s ease;
+}
+
+.severity-indicator:hover {
+  transform: scale(1.1);
+}
+
+.severity-indicator::before {
+  content: "This incident has been classified as severe";
+  position: absolute;
+  bottom: 150%;
+  right: 0;
+  background: #1a1a1a;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  transform: translateX(0);
+}
+
+.severity-indicator::after {
+  content: "";
+  position: absolute;
+  bottom: 140%;
+  right: 10px;
+  border: 5px solid transparent;
+  border-top-color: #1a1a1a;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1001;
+}
+
+.severity-indicator:hover::before,
+.severity-indicator:hover::after {
+  opacity: 1;
 }
 
 .event-card.slide-hidden {
