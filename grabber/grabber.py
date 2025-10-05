@@ -20,20 +20,12 @@ backendUrl = "http://localhost:8000"
 def getArticles():
     wordList = grabutil.create_word_list("news_keywords.json", 500)
     response = newsClient.get_everything(q=wordList, sort_by="relevancy", domains="")
-
+    print(f"got {response["totalResults"]} news articles")
     return response
 
 def classifyData(response):
 
     goodResponses = [curr for curr in response['articles'] if type(curr) == dict and "title" in curr]
-
-    response = geminiClient.models.generate_content(
-        model="gemini-2.5-flash-lite",
-        contents="This is a test. Say hello to the terminal!",
-        config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_budget=0) # Disables thinking
-        )
-    )
 
     titles = [curr['title'] for curr in goodResponses]
     response = geminiClient.models.generate_content(
@@ -53,7 +45,7 @@ def classifyData(response):
             goodResponses[i]['severity'] = curr[2]
             goodResponses[i]['location'] = " ".join(curr[3:])
             total.append(goodResponses[i])
-
+    print(f"filtered and classified {len(total)} news articles")
     return total
 
 def addGeolocation(total):
@@ -61,6 +53,8 @@ def addGeolocation(total):
 
 #TODO
 def postNews(newsArticle):
+    needMap = {"food":0, "clothing":1, "money":2, "volunteers": 3}
+    severityMap = {"high":True, "low":False}
     pushArticle = {
         "title": newsArticle["title"],
         "description": newsArticle["description"],
@@ -68,28 +62,22 @@ def postNews(newsArticle):
         "urlToImage": newsArticle["urlToImage"],
         "location": newsArticle["location"],
         "publishedAt": newsArticle["publishedAt"],
-        "severity": newsArticle["severity"],
-        "need": newsArticle["need"],
+        "severity": severityMap[newsArticle["severity"]],
+        "need": needMap[newsArticle["need"]],
         "category": newsArticle["category"],
         "longitude": newsArticle["longitude"],
         "latitude": newsArticle["latitude"]
     }
 
     httpResponse = requests.post(backendUrl + "/create", json=pushArticle)
-    if(httpResponse.status_code != 200):
-        print(httpResponse)
+    if(httpResponse.status_code != 201):
+        print(httpResponse.status_code)
+        print(httpResponse.text)
 
-dummyArticle = {
-    "title": "test article",
-    "description": "an article was tested",
-    "url": "test ur;",
-    "urlToImage": "https://cdn.discordapp.com/attachments/1423330814208376944/1424257872736292876/B04A9519-8BC1-42D6-8D6C-806D5A0A8A71.png?ex=68e34b02&is=68e1f982&hm=0f1f698b677c78c0389e2d14409e7d16f20afa385c75398c49d81f0c2ae0ac7c&",
-    "location": "Phillidelphia",
-    "publishedAt": "2023-12-31",
-    "severity": False,
-    "need": 1,
-    "category": "warRelief",
-    "longitude": 38.8977,
-    "latitude": 77.0365
-}
-postNews(dummyArticle)
+articlesList = classifyData(getArticles())
+for i in articlesList:
+    i["longitude"] = 38.8977
+    i["latitude"] = 77.0365
+    postNews(i)
+print(f"added {len(articlesList)} news articles")
+
