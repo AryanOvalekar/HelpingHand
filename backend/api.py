@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
         print(e)
     app.db = app.client["articles"]
     yield
-    app.db["articles"].close()
+    app.client.close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -57,3 +57,10 @@ def create_article(request: Request, article: articleModel.articleModel = Body(.
 def get_recent_article(request: Request):
     results = request.app.db["articles"].find()
     return [document for document in results] #no longer hardcoded :)
+
+@app.get("/present", response_description="Check article presence", status_code=status.HTTP_200_OK)
+def check_article(request: Request, title: str = Body(...)):
+    checked = request.app.db["articles"].find_one(
+        {"title": title}
+    )
+    return checked != None

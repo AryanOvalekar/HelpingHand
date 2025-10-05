@@ -21,20 +21,23 @@ backendUrl = "http://localhost:8000"
 
 def getArticles():
     wordList = grabutil.create_word_list("news_keywords.json", 500)
-    response = newsClient.get_everything(q=wordList, sort_by="relevancy", domains="")
-    print(f"got {response["totalResults"]} news articles")
-    return response
+    for i in range(5):
+        response = newsClient.get_everything(q=wordList, sort_by="relevancy", domains="", from_param="2025-09-28", page=i+1)
+        print(f"got {response["totalResults"]} news articles")
+        yield response
 
 def classifyData(response):
     goodResponses = [curr for curr in response['articles'] if type(curr) == dict and "title" in curr]
 
     titles = [curr['title'] for curr in goodResponses]
+    print("Gemini is Classifying...")
     response = geminiClient.models.generate_content(
         model="gemini-2.5-pro",
-        contents=f"For each of the following lines, please determine if it is a situation where volunteers or donations of money, food, or clothes are required to help people in need. If they match the specified criteria, output a new line in the format <need> <category> <severity> <location>. need is 'food', 'clothing', 'money' or 'volunteers' based on what the situation seems to require the most. category is the type of situation the title is among 'naturalDisaster', 'warRelief', 'volunteerWork'. severity is the estimated severity of the situation and urgency of the aid, either 'low' or 'high', be very strict with what you determine as high severity. location is the estimated Country, State, and City of the event based on the line. If the line does not match the specification return 'N/A'. Do not output any other words or text as part of your response, only the previously specified output. Here are the lines each of which for you to classify:\n {"\n".join(titles)}",
+        contents=f"For each of the following lines, please determine if it is a crisis situation where volunteers or donations of money, food, or clothes are required to help people in need. If they match the specified criteria, output a new line in the format <need> <category> <severity> <location>. need is 'food', 'clothing', 'money' or 'volunteers' based on what the situation seems to require the most. category is the type of situation the title is among 'naturalDisaster', 'warRelief', 'volunteerWork'. severity is the estimated severity of the situation and urgency of the aid, either 'low' or 'high', be very strict with what you determine as high severity. location is formatted as 'Country, State, City', the estimated Country, State, and City of the event based on the line, 'Unknown' if you are unable to determine. If the line does not match the specification return 'N/A'. Do not output any other words or text as part of your response, only the previously specified output. Here are the lines each of which for you to classify:\n {"\n".join(titles)}",
         config=types.GenerateContentConfig(
         )
     )
+    print("Classification Complete")
     data = response.text.split('\n')
     total = []
     goodRespCount = min(len(data), len(titles))
@@ -51,13 +54,22 @@ def classifyData(response):
 
 def addGeolocation(total):
     for response in total:
-        if response["location"].strip() != "UNKNOWN":
+        if response["location"][:7] != "Unknown":
             location = geolocator.geocode(response["location"], exactly_one=True)
+            if location == None:
+                response["latitude"] = 0
+                response["longitude"] = 0
+                return
             response["latitude"] = location.latitude
             response["longitude"] = location.longitude
+        else:
+            response["latitude"] = 0
+            response["longitude"] = 0
 
-#TODO
 def postNews(newsArticle):
+    dupeCheck = requests.get(backendUrl + "/present", json=newsArticle["title"])
+    if (dupeCheck.status_code != 200 or dupeCheck.text == "true"):
+        return 0
     needMap = {"food":0, "clothing":1, "money":2, "volunteers": 3}
     severityMap = {"high":True, "low":False}
     pushArticle = {
@@ -78,11 +90,16 @@ def postNews(newsArticle):
     if(httpResponse.status_code != 201):
         print(httpResponse.status_code)
         print(httpResponse.text)
+        return 0
+    return 1
 
-articlesList = classifyData(getArticles())
-for i in articlesList:
-    i["longitude"] = 38.8977
-    i["latitude"] = 77.0365
-    postNews(i)
-print(f"added {len(articlesList)} news articles")
+def collectData():
+    for i in getArticles():
+        articlesList = classifyData(i)
+        addGeolocation(articlesList)
+        numInsert = 0
+        for i in articlesList:
+            numInsert+=postNews(i)
+        print(f"added {numInsert} news articles")
 
+collectData()
