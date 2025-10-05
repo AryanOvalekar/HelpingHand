@@ -27,3 +27,4 @@ def create_word_list(wordFilePath, maxLength = 500):
         currentLength += addedLength
     
     return " OR ".join(result)
+
