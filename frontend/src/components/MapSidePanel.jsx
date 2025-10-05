@@ -71,6 +71,12 @@ const MapSidePanel = ({ incident, isOpen, onClose }) => {
           {(incident.imageLink || incident.urlToImage) && (
             <div className="map-side-panel-image">
               <img src={incident.imageLink || incident.urlToImage} alt={incident.title} />
+              {/* High severity indicator */}
+              {incident.severity && (
+                <div className="severity-indicator">
+                  <span className="severity-text">⚠ SEVERE</span>
+                </div>
+              )}
             </div>
           )}
 
