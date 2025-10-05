@@ -103,9 +103,10 @@ const MapView = () => {
         const existingMarkers = document.querySelectorAll('.mapboxgl-marker')
         existingMarkers.forEach(marker => marker.remove())
 
-        // Create markers for each event that has coordinates
+        // Create markers for each event that has valid coordinates
         events.forEach((event) => {
-            if (event.longitude && event.latitude) {
+            if (event.longitude && event.latitude && 
+                !(event.longitude === 0 && event.latitude === 0)) {
                 const marker = new mapboxgl.Marker({
                     color: '#dc3545' // Same red color for all markers
                 })
