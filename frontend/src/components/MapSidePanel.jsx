@@ -5,13 +5,13 @@ const MapSidePanel = ({ incident, isOpen, onClose }) => {
   if (!incident) return null
 
   // Helper function to get category display info (matching EventCard)
-  const getCategoryInfo = (type) => {
-    switch(type) {
-      case 0:
+  const getCategoryInfo = (category) => {
+    switch(category) {
+      case 'naturalDisaster':
         return { label: 'Disaster', color: '#dc3545', emoji: '🌪️' }
-      case 1:
+      case 'warRelief':
         return { label: 'Relief', color: '#28a745', emoji: '🏥' }
-      case 2:
+      case 'volunteerWork':
         return { label: 'Volunteering', color: '#007bff', emoji: '🤝' }
       default:
         return { label: 'Crisis', color: '#6c757d', emoji: '⚠️' }
@@ -32,12 +32,12 @@ const MapSidePanel = ({ incident, isOpen, onClose }) => {
     }
   }
 
-  const categoryInfo = getCategoryInfo(incident.type)
+  const categoryInfo = getCategoryInfo(incident.category)
   const needInfo = getNeedInfo(incident.need)
 
   const handleReadMore = () => {
-    if (incident.articleLink) {
-      window.open(incident.articleLink, '_blank')
+    if (incident.articleLink || incident.url) {
+      window.open(incident.articleLink || incident.url, '_blank')
     }
   }
 
@@ -68,9 +68,9 @@ const MapSidePanel = ({ incident, isOpen, onClose }) => {
           </div>
 
           {/* Image */}
-          {incident.imageLink && (
+          {(incident.imageLink || incident.urlToImage) && (
             <div className="map-side-panel-image">
-              <img src={incident.imageLink} alt={incident.title} />
+              <img src={incident.imageLink || incident.urlToImage} alt={incident.title} />
             </div>
           )}
 

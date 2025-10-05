@@ -3,6 +3,7 @@ import './MapView.css'
 import { useRef, useEffect, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
+import axios from 'axios'
 import MapSidePanel from '../components/MapSidePanel'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
@@ -14,6 +15,52 @@ const MapView = () => {
         isOpen: false,
         incident: null
     })
+    const [events, setEvents] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                setLoading(true)
+                
+                // Fetch events from API
+                const response = await axios.get('http://localhost:8000/recent')
+                
+                // Map API response to frontend format, preserving all fields from the model
+                const mappedEvents = response.data.map((article, index) => ({
+                    // Article model fields
+                    id: article._id || article.id || index,
+                    title: article.title,
+                    description: article.description,
+                    url: article.url,
+                    urlToImage: article.urlToImage,
+                    publishedAt: article.publishedAt,
+                    category: article.category,
+                    severity: article.severity,
+                    location: article.location,
+                    need: article.need,
+                    longitude: article.longitude,
+                    latitude: article.latitude,
+                    
+                    // Frontend display fields (mapped from model)
+                    imageLink: article.urlToImage,
+                    articleLink: article.url,
+                    coordinates: [article.longitude, article.latitude]
+                }))
+                
+                setEvents(mappedEvents)
+                setError(null)
+            } catch (err) {
+                setError(err.message)
+                console.error('Error fetching events:', err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchEvents()
+    }, [])
 
     useEffect(() => {
         if (map.current) return
@@ -33,41 +80,12 @@ const MapView = () => {
             })
         );
 
-        // Add a test marker once the map loads
+        // Add markers once the map loads
         map.current.on('load', () => {
-            // Test incident data
-            const testIncident = {
-                id: 1,
-                title: "Hurricane Relief Effort - NYC",
-                description: "Urgent assistance needed for hurricane victims in New York area. Volunteers and supplies desperately needed for evacuation and emergency shelter operations.",
-                location: "New York, NY",
-                type: 0, // Disaster
-                need: 1, // Clothing needed (0=food, 1=clothing, 2=money, other=help)
-                imageLink: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400",
-                articleLink: "https://example.com/hurricane-relief"
-            };
-
-            // Create marker element for custom styling if needed
-            const testMarker = new mapboxgl.Marker({
-                color: '#ff4444'
-            })
-            .setLngLat([-74.006, 40.7128]) // NYC coordinates
-            .addTo(map.current);
-
-            // Add click event to marker
-            testMarker.getElement().addEventListener('click', (e) => {
-                e.stopPropagation();
-                
-                setSidePanelState({
-                    isOpen: true,
-                    incident: testIncident
-                });
-            });
-
-            console.log('Test marker with custom React side panel added');
+            // Markers will be added by the events useEffect below
         });
 
-        // Close side panel when clicking on map (optional - you might want to remove this)
+        // Close side panel when clicking on map (optional)
         map.current.on('click', () => {
             // Uncomment if you want map clicks to close the panel
             // setSidePanelState(prev => ({ ...prev, isOpen: false }));
@@ -76,6 +94,38 @@ const MapView = () => {
         return () => {
         }
     }, [])
+
+    // Add markers when events data is loaded
+    useEffect(() => {
+        if (!map.current || !events.length) return
+
+        // Clear existing markers (if any)
+        const existingMarkers = document.querySelectorAll('.mapboxgl-marker')
+        existingMarkers.forEach(marker => marker.remove())
+
+        // Create markers for each event that has coordinates
+        events.forEach((event) => {
+            if (event.longitude && event.latitude) {
+                const marker = new mapboxgl.Marker({
+                    color: '#dc3545' // Same red color for all markers
+                })
+                .setLngLat([event.longitude, event.latitude])
+                .addTo(map.current);
+
+                // Add click event to each marker
+                marker.getElement().addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    setSidePanelState({
+                        isOpen: true,
+                        incident: event
+                    });
+                });
+            }
+        });
+
+        console.log('Added markers for', events.length, 'events');
+    }, [events])
 
     const closeSidePanel = () => {
         setSidePanelState(prev => ({ ...prev, isOpen: false }));
