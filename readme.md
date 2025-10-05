@@ -26,7 +26,7 @@ Link will go here
 ## Devpost
 
 View the project on Devpost:
-Link will go here
+https://devpost.com/software/helping-hand-4y163t
 
 ## Installation
 
@@ -74,5 +74,5 @@ fastapi run api.py --port 8000
 ### Data Grabber
 ```bash
 cd grabber
-# Command unknown for now
+python grabber.py
 ```
